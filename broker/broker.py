@@ -56,4 +56,4 @@ class FueLRessoure(Resource):
 api.add_resource(FueLRessoure, '/fuel/<string:fuel_id>')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=4444, host='0.0.0.0')
+    app.run(debug=False, port=4444, host='0.0.0.0')
