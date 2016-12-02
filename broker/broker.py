@@ -22,7 +22,7 @@ def teardown_db(exception):
 
 
 class FueLRessoure(Resource):
-    #@app.cli.command('get_interactor')
+    @app.cli.command('get_interactor')
     def get(self, _id):
         return jsonify(g.iactor.get_data(_id))
 
