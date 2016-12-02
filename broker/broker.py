@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import Resource, Api
 from interactor import Interactor, FuelModel, Fuel
 
@@ -10,8 +10,8 @@ i = Interactor('fuel', FuelModel, Fuel)
 
 
 class FueLRessoure(Resource):
-    def get(self):
-        return {'hello': 'world'}
+    def get(self, _id):
+        return jsonify(i.get_data(_id))
 
 api.add_resource(FueLRessoure, '/')
 
