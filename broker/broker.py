@@ -28,7 +28,7 @@ class FueLRessoure(Resource):
         data = {'_id': "1", 'data': 'hello World!'}
         return jsonify(data[_id])
 
-api.add_resource(FueLRessoure, '/fuel/<int:_id>')
+api.add_resource(FueLRessoure, '/fuel/<string:_id>')
 
 if __name__ == '__main__':
     app.run(debug=True, port=4444, host='0.0.0.0')
