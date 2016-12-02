@@ -26,7 +26,7 @@ class FueLRessoure(Resource):
     def get(self):
         return jsonify(g.iactor.get_data(1))
 
-api.add_resource(FueLRessoure, '/fuel=<int:_id>')
+api.add_resource(FueLRessoure, '/fuel')
 
 if __name__ == '__main__':
     app.run(debug=True, port=4444, host='0.0.0.0')
