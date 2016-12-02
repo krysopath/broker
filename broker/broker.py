@@ -13,7 +13,7 @@ class FueLRessoure(Resource):
     def get(self, _id):
         return jsonify(i.get_data(_id))
 
-api.add_resource(FueLRessoure, '/')
+api.add_resource(FueLRessoure, '/fuel=<int:_id>')
 
 if __name__ == '__main__':
     app.run(debug=True, port=4444, host='0.0.0.0')
