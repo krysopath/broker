@@ -9,14 +9,14 @@ api = Api(app)
 
 
 def get_interactor():
-    iactor = getattr(g, 'iactor', None)
+    iactor = getattr(g, '_iactor', None)
     if iactor is None:
-        iactor = g._database = Interactor('fuel', FuelModel, Fuel)
+        iactor = g._iactor = Interactor('fuel', FuelModel, Fuel)
     return iactor
 
 @app.teardown_appcontext
 def teardown_db(exception):
-    iactor = getattr(g, 'iactor', None)
+    iactor = getattr(g, '_iactor', None)
     if iactor is not None:
         iactor.close()
 
