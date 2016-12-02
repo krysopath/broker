@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
-from flask import Flask, jsonify, g
+from flask import Flask, jsonify, g, request
 from flask_restful import Resource, Api
 from interactor import Interactor, FuelModel, Fuel
 
@@ -22,13 +22,15 @@ def teardown_db(exception):
 
 
 class FueLRessoure(Resource):
+    fuels = {'1': {'data': 'blabla'}}
+    def get(self, fuel_id):
+        return jsonify({fuel_id: self.fuels[fuel_id]})
 
-    #@app.cli.command('get_interactor')
-    def get(self, _id=None):
-        data = {'_id': "1", 'data': 'hello World!'}
-        return jsonify(data[_id])
+    def put(self, fuel_id):
+        self.fuels[fuel_id] = request.form['data']
+        return jsonify({fuel_id: self.fuels[fuel_id]})
 
-api.add_resource(FueLRessoure, '/fuel/<string:_id>')
+api.add_resource(FueLRessoure, '/fuel/<string:fuel_id>')
 
 if __name__ == '__main__':
     app.run(debug=True, port=4444, host='0.0.0.0')
