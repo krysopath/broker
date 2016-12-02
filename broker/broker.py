@@ -23,8 +23,8 @@ def teardown_db(exception):
 
 class FueLRessoure(Resource):
     @app.cli.command('get_interactor')
-    def get(self, _id):
-        return jsonify(g.iactor.get_data(_id))
+    def get(self):
+        return jsonify(g.iactor.get_data(1))
 
 api.add_resource(FueLRessoure, '/fuel=<int:_id>')
 
