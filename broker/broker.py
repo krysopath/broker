@@ -23,10 +23,10 @@ def teardown_db(exception):
 
 class FueLRessoure(Resource):
     @app.cli.command('get_interactor')
-    def get(self):
-        return jsonify(g.iactor.get_data(1))
+    def get(self, _id=None):
+        return jsonify({'_id': 1, 'data': 'hello World!'}[_id])
 
-api.add_resource(FueLRessoure, '/fuel')
+api.add_resource(FueLRessoure, '/fuel/<int:_id>')
 
 if __name__ == '__main__':
     app.run(debug=True, port=4444, host='0.0.0.0')
