@@ -77,7 +77,7 @@ def abort_if_id_doesnt_exist(_id):
         abort(404, message="item {} doesn't exist".format(_id))
 
 
-class FueLRessoure(Resource):
+class FuelRessoure(Resource):
 
     @auth.login_required
     def get(self, fuel_id):
@@ -93,9 +93,9 @@ class FueLRessoure(Resource):
         )
 
     @auth.login_required
-    def delete(self, _id):
-        abort_if_id_doesnt_exist(_id)
-        del fuels[_id]
+    def delete(self, fuel_id):
+        abort_if_id_doesnt_exist(fuel_id)
+        del fuels[fuel_id]
         return '', 204
 
 
@@ -111,7 +111,7 @@ class FuelList(Resource):
     #    fuels[todo_id] = {'task': args['task']}
     #    return jsonify(fuels([todo_id])), 201
 
-api.add_resource(FueLRessoure, '/fuel/<string:fuel_id>')
+api.add_resource(FuelRessoure, '/fuel/<string:fuel_id>')
 api.add_resource(FuelList, '/fuels')
 
 if __name__ == '__main__':
