@@ -53,7 +53,7 @@ def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 401)
 
 
-@app.errorhandler(404)
+#@app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
