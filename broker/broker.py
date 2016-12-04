@@ -2,8 +2,9 @@
 # coding=utf-8
 from flask import Flask, jsonify, g, request, make_response
 from flask_restful import Resource, Api, reqparse, abort
+from flask_httpauth import HTTPBasicAuth
+
 from interactor import Interactor, FuelModel, Fuel
-from flask.ext.httpauth import HTTPBasicAuth
 from fractions import Fraction as frac
 
 app = Flask(__name__)
@@ -71,16 +72,31 @@ def teardown_db(exception):
         iactor.close()
 
 
+def abort_if_id_doesnt_exist(_id):
+    if _id not in fuels:
+        abort(404, message="item {} doesn't exist".format(_id))
+
+
 class FueLRessoure(Resource):
 
     @auth.login_required
     def get(self, fuel_id):
-        return jsonify({fuel_id: fuels[fuel_id]})
+        return jsonify(
+            {fuel_id: fuels[fuel_id]}
+        )
 
     @auth.login_required
     def put(self, fuel_id):
         fuels[fuel_id] = request.form['data']
-        return jsonify({fuel_id: fuels[fuel_id]})
+        return jsonify(
+            {fuel_id: fuels[fuel_id]}
+        )
+
+    @auth.login_required
+    def delete(self, _id):
+        abort_if_id_doesnt_exist(_id)
+        del fuels[_id]
+        return '', 204
 
 
 class FuelList(Resource):
