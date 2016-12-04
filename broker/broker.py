@@ -4,6 +4,7 @@ from flask import Flask, jsonify, g, request, make_response
 from flask_restful import Resource, Api
 from interactor import Interactor, FuelModel, Fuel
 from flask.ext.httpauth import HTTPBasicAuth
+from fractions import Fraction as frac
 
 app = Flask(__name__)
 api = Api(app)
@@ -42,7 +43,21 @@ def teardown_db(exception):
 
 
 class FueLRessoure(Resource):
-    fuels = {'1': {'data': 'blabla'}}
+    fuels = {
+        '1': {
+            'elements': {
+                '_C': frac(500/1000),
+                '_S': frac(2/1000),
+                '_Cl': frac(2/1000),
+                '_N': frac(2/1000),
+                '_O': frac(380/1000),
+                '_H': frac(100/1000),
+                '_F': frac(2/1000),
+                '_Ash': frac(12/1000)
+            },
+            'name': 'testfuel'
+        }
+    }
 
     @auth.login_required
     def get(self, fuel_id):
