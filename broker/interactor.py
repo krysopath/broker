@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
 from tbx_dbio import DataSet, DataModel
+from fractions import Fraction as Fraction
 __dbfile__ = '%s-fuels.db'
 
 
@@ -124,7 +125,7 @@ class Fuel(DataSet):
 
     @C.setter
     def C(self, x):
-        x = frac(x)
+        x = Fraction(x)
         if 0 <= x <= 100:
             self.remove('_C')
             self.mixin('_C', x)
@@ -132,9 +133,19 @@ class Fuel(DataSet):
         else:
             raise ValueError('number needs to be between 0 and 100 %mas')
 
+    @F.setter
+    def F(self, x):
+        x = Fraction(x)
+        if 0 <= x <= 100:
+            self.remove('_F')
+            self.mixin('_F', x)
+            self._F = x
+        else:
+            raise ValueError('number needs to be between 0 and 100 %mas')
+
     @O.setter
     def O(self, x):
-        x = frac(x)
+        x = Fraction(x)
         if 0 <= x <= 100:
             self.remove('_O')
             self.mixin('_O', x)
@@ -144,7 +155,7 @@ class Fuel(DataSet):
 
     @H.setter
     def H(self, x):
-        x = frac(x)
+        x = Fraction(x)
         if 0 <= x <= 100:
             self.remove('_H')
             self.mixin('_H', x)
@@ -154,7 +165,7 @@ class Fuel(DataSet):
 
     @N.setter
     def N(self, x):
-        x = frac(x)
+        x = Fraction(x)
         if 0 <= x <= 100:
             self.remove('_N')
             self.mixin('_N', x)
@@ -164,7 +175,7 @@ class Fuel(DataSet):
 
     @S.setter
     def S(self, x):
-        x = frac(x)
+        x = Fraction(x)
         if 0 <= x <= 100:
             self.remove('_S')
             self.mixin('_S', x)
@@ -174,7 +185,7 @@ class Fuel(DataSet):
 
     @Cl.setter
     def Cl(self, x):
-        x = frac(x)
+        x = Fraction(x)
         if 0 <= x <= 100:
             self.remove('_Cl')
             self.mixin('_Cl', x)
@@ -184,7 +195,7 @@ class Fuel(DataSet):
 
     @Ash.setter
     def Ash(self, x):
-        x = frac(x)
+        x = Fraction(x)
         if 0 <= x <= 100:
             self.remove('_Ash')
             self.mixin('_Ash', x)
@@ -195,7 +206,7 @@ class Fuel(DataSet):
     @H2O.setter
     def H2O(self, x):
         if 0 <= x <= 100:
-            x = frac(x)
+            x = Fraction(x)
             self.remove('_H2O')
             self.mixin('_H2O', x)
             self._H2O = x
@@ -206,10 +217,9 @@ class Fuel(DataSet):
         for old_element, old_value in self:
             if old_value:
                 if old_element != element:
-                    setattr(self, old_element, frac(old_value * (1 - amount)))
+                    setattr(self, old_element, Fraction(old_value * (1 - amount)))
                 else:
-                    setattr(self, old_element, frac(amount))
-
+                    setattr(self, old_element, Fraction(amount))
 
     def remove(self, element):
         if self[element]:
@@ -217,12 +227,12 @@ class Fuel(DataSet):
                 if old_value:
                     if old_element != element:
                         try:
-                            setattr(self, old_element, frac(
-                                frac(old_value) * frac(1 / (1 - frac(self[element])))
+                            setattr(self, old_element, Fraction(
+                                Fraction(old_value) * Fraction(1 / (1 - Fraction(self[element])))
                             ))
                         except ZeroDivisionError:
-                            setattr(self, old_element, frac(0))
-                            self[old_element] = frac(0)
+                            setattr(self, old_element, Fraction(0))
+                            self[old_element] = Fraction(0)
                     else:
                         pass
 
@@ -234,9 +244,9 @@ class Fuel(DataSet):
                     add = anteil * self.__elementarfaktor[formel][element] * 100
                     hzwert += add
             except KeyError as ke:
-                pass
+                print(ke)
             except TypeError as te:
-                pass
+                print(te)
             except Exception as e:
                 raise e
 
@@ -263,7 +273,7 @@ class Interactor:
         self.db = self.model(
             'fuels',
             self.model.schema,
-            __dbfile__ % (self.user)
+            __dbfile__ % self.user
         )
         try:
             self.db.create()
@@ -272,7 +282,7 @@ class Interactor:
             print('(%s)' % e)
 
     def add_data(self, data=None):
-         self.db.add(
+        self.db.add(
             dict(data)
         )
 
@@ -296,15 +306,15 @@ class Interactor:
             print('none found')
             return None
 
-    def list_data(self, filter=None):
-        if not filter:
+    def list_data(self, _filter=None):
+        if not _filter:
             out = self.db.get_summary(
                 select='*'
             )
         else:
             out = self.db.get_filter_summary(
                 select='*',
-                where='_group', like=filter
+                where='_group', like=_filter
             )
         return [self.dataset(**result) for result in out if result]
 
