@@ -3,7 +3,7 @@
 from flask import Flask, jsonify, g, request, make_response
 from flask_restful import Resource, Api, reqparse, abort
 from interactor import Interactor, FuelModel, Fuel
-from flask.httpauth import HTTPBasicAuth
+from flask.ext.httpauth import HTTPBasicAuth
 from fractions import Fraction as frac
 
 app = Flask(__name__)
