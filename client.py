@@ -10,13 +10,16 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 class ApiError(Exception):
     pass
 
-__uri__ = 'https://g:g25v09e85@endtropie.mooo.com/api/v1/users'
+__uri__ = 'https://g:g25v09e85@localhost:4444/api/v1/users'
 
 
 def requester(fn):
     @wraps(fn)
     def req(*args, **kwargs):
+        t = time.time()
         resp = fn(*args, **kwargs)
+        tdelta = time.time() - t
+        print(round(tdelta, 5), 'seconds for', resp.request)
         if resp.status_code != 200:
             #print(dir(resp))
             raise ApiError('{} {}'.format(resp.request, resp.url), resp.status_code)
@@ -46,23 +49,25 @@ class Actor:
         )
 
     @requester
+    def add_user(self, **user_args):
+        return requests.post(
+            __uri__,
+            json=user_args,
+            verify=self.verify
+        )
+
+    @requester
     def del_user(self, name):
         return requests.delete(__uri__ + "/%s" % name, verify=self.verify)
 
 
 def main():
-    a = Actor()
+
     users = a.request_all()
-    try:
-        user = a.get_user(users['1']['name'])
-    except ApiError as ae:
-        print(ae.args[0], 'failed with', ae.args[1])
-        user = {'result': None}
-    finally:
-        for u in users:
-            print(u, users[u])
+    for u in users:
+        print(u, users[u])
 
-
+a = Actor()
 if __name__ == "__main__":
     main()
 
