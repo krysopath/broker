@@ -161,5 +161,5 @@ if __name__ == '__main__':
         port=4444,
         ssl_context=context,
         threaded=True,
-        debug=True)
+        debug=False)
 
