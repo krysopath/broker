@@ -44,13 +44,25 @@ class User(Base):
         lazy='dynamic'
     )
 
+    def __init__(self, name=None, fullname=None, group=None, rank=None):
+        self.name = name
+        self.fullname = fullname
+        self.group = group
+        self.rank = rank
+
     def __repr__(self):
-        return "<User(id='%s', name='%s')>" \
-               % (self.id, self.name)
+        return "<User(id='%s', name='%s', group='%s', rank='%s', creation_time='%s')>" \
+               % (self.id, self.name, self.group, self.rank, self.creation_time)
 
     def __iter__(self):
-        for p in ['id', 'name', 'fullname', 'group', 'rank', 'creation_time', 'emails', 'xmpp']:
+        for p in ['id', 'name', 'fullname', 'group', 'rank', 'creation_time', 'emails', 'jids', 'friends']:
             yield p, getattr(self, p)
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
 
     def toJSON(self):
         return {pk: pv for pk, pv in self}
@@ -64,6 +76,9 @@ class Email(Base):
 
     user = relationship(
         "User", back_populates="emails")
+
+    def __init__(self, addr=None):
+        self.addr = addr
 
     def __repr__(self):
         return "<Email(id='%s', addr='%s')>" \
@@ -91,8 +106,11 @@ class JID(Base):
 
     user = relationship("User", back_populates="jids")
 
+    def __init__(self, jid=None):
+        self.jid = jid
+
     def __repr__(self):
-        return "<XMPP(id='%s', jid='%s')>" \
+        return "<JID(id='%s', jid='%s')>" \
                % (self.id, self.jid)
 
     def __iter__(self):

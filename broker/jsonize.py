@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
 import datetime
+from functools import wraps
 from json import JSONEncoder, dumps
 
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -68,7 +69,6 @@ class AlchemyEncoder(JSONEncoder):
                                 'hour': data.hour,
                                 'min': data.minute,
                                 'sec': data.second,
-                                'microsec': data.microsecond
                             }
                     elif isinstance(data, InstrumentedList):
                         fields[field] = [dict(n) for n in data]
@@ -100,4 +100,10 @@ def jsonize(obj, indent=2):
     return dumps(obj, cls=AlchemyEncoder, indent=indent)
 
 
+def jsonifier(obj):
+    @wraps(obj)
+    def wrapped(to_json=True, indent=2, *args, **kwargs):
+        result = obj(*args, **kwargs)
+        return jsonize(result, indent)
 
+    return wrapped

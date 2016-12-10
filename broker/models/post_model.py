@@ -47,6 +47,13 @@ class Post(Base):
         )
     )
 
+    def __init__(self, content=None):
+        self.content = content
+
+    def __repr__(self):
+        return "<Post(id='%s', creation_time='%s')>" \
+               % (self.id, self.creation_time)
+
 
 User.posts = relationship(
     "Post",
@@ -58,3 +65,10 @@ class Tag(Base):
     __tablename__ = "tags"
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
+
+    def __init__(self, name=None):
+        self.name = name
+
+    def __repr__(self):
+        return "<Tag(id='%s', name='%s')>" \
+               % (self.id, self.name)

@@ -11,6 +11,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = __dbconn__
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 from broker.database import db_session, init_db
+from broker.models import *
+from broker.models.user_func import *
+from broker.util import requires_auth
+from broker.parser import user_parser
+from broker.jsonize import jsonize, jsonifier
+from broker.exceptions import *
 
 
 @app.teardown_appcontext
@@ -20,6 +26,14 @@ def shutdown_session(exception=None):
 
 init_db()
 
+
+@jsonifier
+def test():
+    return User.query.all()
+
+
+members = make_members_friends("admin")
+print(members)
 exit()
 
 
