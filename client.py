@@ -10,7 +10,9 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 class ApiError(Exception):
     pass
 
-__uri__ = 'https://g:g25v09e85@localhost:4444/api/v1/users'
+__uri_public__ = 'https://g:g25v09e85@endtropie.mooo.com/api/v1/users'
+__uri_dev__ = 'https://g:g25v09e85@localhost:4444/api/v1/users'
+__uri__ = __uri_dev__
 
 
 def requester(fn):
@@ -21,7 +23,6 @@ def requester(fn):
         tdelta = time.time() - t
         print(round(tdelta, 5), 'seconds for', resp.request)
         if resp.status_code != 200:
-            #print(dir(resp))
             raise ApiError('{} {}'.format(resp.request, resp.url), resp.status_code)
         else:
             return resp.json()
@@ -34,14 +35,22 @@ class Actor:
 
     @requester
     def request_all(self):
-        return requests.get(__uri__, verify=self.verify)
+        return requests.get(
+            __uri__,
+            verify=self.verify
+        )
 
     @requester
     def get_user(self, name):
-        return requests.get(__uri__ + "/%s" % name, verify=self.verify)
+        return requests.get(
+            __uri__ + "/%s" % name,
+            verify=self.verify
+        )
 
     @requester
-    def update_user(self, username, **user_args):
+    def update_user(self,
+                    username,
+                    **user_args):
         return requests.put(
             __uri__ + "/%s" % username,
             json=user_args,
@@ -58,14 +67,25 @@ class Actor:
 
     @requester
     def del_user(self, name):
-        return requests.delete(__uri__ + "/%s" % name, verify=self.verify)
+        return requests.delete(
+            __uri__ + "/%s" % name,
+            verify=self.verify
+        )
+
+    @requester
+    def get_adresses(self, name):
+        return requests.get(
+            __uri__ + "/%s" % name, verify=self.verify
+        )
 
 
 def main():
-
+    for n in range(100):
+        a.add_user(**{'group': 'admin', 'fullname': 'piedro', 'name': 'piedro-%s' % n, 'rank': -1})
     users = a.request_all()
     for u in users:
         print(u, users[u])
+
 
 a = Actor()
 if __name__ == "__main__":

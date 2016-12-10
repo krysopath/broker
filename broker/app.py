@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
-from config import __dbconn__
+from .config import __dbconn__
 from flask import Flask
 
 app = Flask(__name__)

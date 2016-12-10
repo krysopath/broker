@@ -4,10 +4,14 @@
 from flask import jsonify
 from flask_restful import Resource, Api
 
-from util import requires_auth
-from parser import user_parser
-from model import db, app, User
-from exceptions import *
+from broker.util import requires_auth
+from broker.parser import user_parser
+from broker.model import db, app, User, Email, Xmpp, getuser
+from broker.jsonize import jsonize
+from broker.exceptions import *
+u = getuser()
+users = db.session.query(User).all()
+_json = jsonize(u)
 
 
 class UsersAPI(Resource):
@@ -29,10 +33,9 @@ class UsersAPI(Resource):
         if not check:
             user = User()
             user.name = args['name']
-            user.email = args['email']
             user.group = args['group']
-            user.fullname = args['fullname']
-            user.rank = args['rank']
+            user.fullname = args['fullname'] or None
+            user.rank = args['rank'] or 100
 
             db.session.add(user)
             db.session.commit()
@@ -49,9 +52,9 @@ class UserAPI(Resource):
         user = db.session.query(User)\
             .filter(User.name == user_name)\
             .first()
-        results = {'data': dict(user)}
-
-        return jsonify(results)
+        if user:
+            results = {'data': dict(user)}
+            return jsonify(results)
 
     @requires_auth
     def put(self, user_name):
