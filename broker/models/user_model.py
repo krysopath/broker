@@ -64,9 +64,6 @@ class User(Base):
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()
 
-    def toJSON(self):
-        return {pk: pv for pk, pv in self}
-
 
 class Email(Base):
     __tablename__ = "emails"
@@ -87,9 +84,6 @@ class Email(Base):
     def __iter__(self):
         for p in ['id', 'addr']:
             yield p, getattr(self, p)
-
-    def toJSON(self):
-        return {pk: pv for pk, pv in self}
 
 
 User.emails = relationship(
@@ -116,9 +110,6 @@ class JID(Base):
     def __iter__(self):
         for p in ['id', 'jid']:
             yield p, getattr(self, p)
-
-    def toJSON(self):
-        return {pk: pv for pk, pv in self}
 
 
 User.jids = relationship(

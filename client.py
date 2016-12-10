@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 # coding=utf-8
-import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import time
 from functools import wraps
+from json import loads
+
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -11,7 +14,7 @@ class ApiError(Exception):
     pass
 
 __uri_public__ = 'https://g:g25v09e85@endtropie.mooo.com/api/v1/users'
-__uri_dev__ = 'https://g:g25v09e85@localhost:4444/api/v1/users'
+__uri_dev__ = 'http://g:g25v09e85@localhost:4444/api/v1/users'
 __uri__ = __uri_dev__
 
 
@@ -30,9 +33,26 @@ def requester(fn):
     return req
 
 
+def decoder(fn):
+    @wraps(fn)
+    def req(*args, **kwargs):
+        t = time.time()
+        resp = fn(*args, **kwargs)
+        result = resp['result']
+        action = resp['action']
+        tdelta = time.time() - t
+
+        print(round(tdelta, 5), 'seconds for decoding of Request')
+        return loads(result), action
+
+    return req
+
+
+
 class Actor:
     verify = False
 
+    @decoder
     @requester
     def request_all(self):
         return requests.get(
@@ -80,11 +100,15 @@ class Actor:
 
 
 def main():
-    for n in range(100):
-        a.add_user(**{'group': 'admin', 'fullname': 'piedro', 'name': 'piedro-%s' % n, 'rank': -1})
-    users = a.request_all()
-    for u in users:
-        print(u, users[u])
+    # for n in range(100):
+    #    a.add_user(**{'group': 'admin', 'fullname': 'piedro', 'name': 'piedro-%s' % n, 'rank': -1})
+    api_response, action = a.request_all()
+    print(action, type(action))
+    for id, user in api_response['users'].items():
+        print(id, user['fullname'], user['friends'], user['group'], )
+
+
+
 
 
 a = Actor()
