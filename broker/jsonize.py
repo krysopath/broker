@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # coding=utf-8
-#from broker.model import Email
 import datetime
 from json import JSONEncoder, dumps
+
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm.collections import InstrumentedList, InstrumentedSet, InstrumentedDict
 from sqlalchemy.orm.query import Query
+
 __date_as_string__ = False
+
 
 class ComplexEncoder(JSONEncoder):
     def default(self, obj):
@@ -66,21 +68,19 @@ class AlchemyEncoder(JSONEncoder):
                                 'hour': data.hour,
                                 'min': data.minute,
                                 'sec': data.second,
+                                'microsec': data.microsecond
                             }
                     elif isinstance(data, InstrumentedList):
-                        #print('list:', data)
                         fields[field] = [dict(n) for n in data]
                     elif isinstance(data, Query):
-                        #print('friends: ')
                         fields[field] = [
-                            {
-                                'id': n.id,
-                                'name': n.name,
-                                'since': n.
-                            } for n in data.all()]
+                            {'id': n.id,
+                             'name': n.name,
+                             'rank': n.rank,
+                             } for n in data.all()
+                            ]
 
                     elif isinstance(data, set):
-                        #print('set:', data)
                         fields[field] = [x for x in data]
                     else:
                         print('found some stuff in', type(data))
