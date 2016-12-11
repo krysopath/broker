@@ -2,27 +2,34 @@
 # coding=utf-8
 from flask_restful import Resource
 
-from broker.jsonize import jsonifier
+from broker.jsonize import jsonize
 from broker.models import get_all_users
 from broker.util import requires_auth
 
 
 class UsersAPI(Resource):
+
     @requires_auth
     def get(self):
-        @jsonifier
-        def _response():
+        @jsonize
+        def results():
             result = {}
             for user in get_all_users():
                 result[user.id] = user
+                # print(user.id)
 
-            resp = {'users': result}
-            return resp
+            resp = {"users": result}
 
-        return {
-            "action": "get_all_users",
-            "result": _response()
-        }
+            _serialised = {
+                "action": "get_all_users",
+                "result": resp}
+
+            return _serialised
+
+        out = results()
+        print(out)
+        return out
+
 
 # class UsersAPI(Resource):
 #     @requires_auth

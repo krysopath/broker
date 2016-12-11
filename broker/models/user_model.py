@@ -51,8 +51,8 @@ class User(Base):
         self.rank = rank
 
     def __repr__(self):
-        return "<User(id='%s', name='%s', group='%s', rank='%s', creation_time='%s')>" \
-               % (self.id, self.name, self.group, self.rank, self.creation_time)
+        return "<User(id='%s', name='%s')>" \
+               % (self.id, self.name,)
 
     def __iter__(self):
         for p in ['id', 'name', 'fullname', 'group', 'rank', 'creation_time', 'emails', 'jids', 'friends']:

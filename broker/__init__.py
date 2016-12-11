@@ -13,7 +13,7 @@ from broker.database import db_session, init_db
 from broker.models import *
 from broker.models.user_func import *
 from broker.ressources.users_ressources import UsersAPI
-from broker.jsonize import jsonifier
+from broker.jsonize import jsonize
 from broker.exceptions import *
 
 

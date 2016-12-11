@@ -65,7 +65,7 @@ class DataEncoder(JSONEncoder):
 
 
 class AlchemyEncoder(JSONEncoder):
-    def non_default(self, obj):
+    def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
 
             # an SQLAlchemy class
@@ -75,10 +75,11 @@ class AlchemyEncoder(JSONEncoder):
                           and x not in ['metadata', 'query', 'query_class']]:
                 data = obj.__getattribute__(field)
                 try:
-                    #print('in AlchEnc', data, data.__class__)
-                    dumps(data) # this will fail on non-encodable values, like other classes
+                    print('in AlchEnc', data, data.__class__)
+                    dumps(data, indent=2)  # this will fail on non-encodable values, like other classes
                     fields[field] = data
                 except TypeError:
+
                     if isinstance(data, datetime):
                         if __date_as_string__:
                             fields[field] = str(data)
@@ -89,14 +90,15 @@ class AlchemyEncoder(JSONEncoder):
                                 'day': data.day,
                                 'hour': data.hour,
                                 'min': data.minute,
-                                'sec': data.second,
-                            }
+                                'sec': data.second, }
 
                     elif isinstance(data, InstrumentedList):
                         fields[field] = "IntrumentedList"
 
                     elif isinstance(data, Query):
-                        fields[field] = [x.id for x in data.all()]
+                        fields[field] = [
+                            {'id': x.id,
+                             'name': x.name} for x in data.all()]
 
                     else:
                         fields[field] = "Error"
@@ -109,24 +111,19 @@ class AlchemyEncoder(JSONEncoder):
 
 class APIEncoder(JSONEncoder):
     def default(self, obj):
-        print(obj, obj.__class__)
 
         if isinstance(obj.__class__, DeclarativeMeta):
             print("encoding", obj.__class__, "with", AlchemyEncoder)
 
-            return AlchemyEncoder(indent=0, check_circular=False).non_default(obj)
+            return AlchemyEncoder(indent=0, check_circular=False).default(obj)
 
-        if isinstance(obj, datetime):
-            print("decoding", obj.__class__, "with", DataEncoder)
-            return DataEncoder(indent=2).default(obj)
+            # return JSONEncoder().default(serialized)
 
 
-
-
-def jsonifier(obj):
+def jsonize(obj):
     @wraps(obj)
     def wrapped(*args, **kwargs):
         result = obj(*args, **kwargs)
-        return dumps(result, cls=APIEncoder, indent=4)
+        return dumps(result, cls=APIEncoder)
 
     return wrapped

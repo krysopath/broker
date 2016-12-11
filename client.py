@@ -24,11 +24,11 @@ def requester(fn):
         t = time.time()
         resp = fn(*args, **kwargs)
         tdelta = time.time() - t
-        print(round(tdelta, 5), 'seconds for', resp.request)
+        print(round(tdelta, 5), 'sec for', resp.request)
         if resp.status_code != 200:
             raise ApiError('{} {}'.format(resp.request, resp.url), resp.status_code)
         else:
-            return resp.json()
+            return resp
 
     return req
 
@@ -38,15 +38,18 @@ def decoder(fn):
     def req(*args, **kwargs):
         t = time.time()
         resp = fn(*args, **kwargs)
-        result = resp['result']
-        action = resp['action']
+        result = resp.json()
+        print(result)
+        # action = resp['action']
         tdelta = time.time() - t
 
-        print(round(tdelta, 5), 'seconds for decoding of Request')
-        return loads(result), action
+        print(round(tdelta, 5), 'sec for decoding of Request', resp.url)
+        try:
+            return loads(result), resp.status_code
+        except TypeError:
+            return "", None
 
     return req
-
 
 
 class Actor:
@@ -104,8 +107,7 @@ def main():
     #    a.add_user(**{'group': 'admin', 'fullname': 'piedro', 'name': 'piedro-%s' % n, 'rank': -1})
     api_response, action = a.request_all()
     print(action, type(action))
-    for id, user in api_response['users'].items():
-        print(id, user['fullname'], user['friends'], user['group'], )
+
 
 
 
