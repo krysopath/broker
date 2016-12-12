@@ -2,7 +2,7 @@
 # coding=utf-8
 import time
 from functools import wraps
-from json import loads
+from pprint import pprint
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -21,9 +21,14 @@ __uri__ = __uri_dev__
 def requester(fn):
     @wraps(fn)
     def req(*args, **kwargs):
+
         t = time.time()
         resp = fn(*args, **kwargs)
         tdelta = time.time() - t
+        print('requested', resp.url)
+        with open('last-response.txt', 'w') as last:
+            last.write(resp.text)
+
         print(round(tdelta, 5), 'sec for', resp.request)
         if resp.status_code != 200:
             raise ApiError('{} {}'.format(resp.request, resp.url), resp.status_code)
@@ -36,19 +41,23 @@ def requester(fn):
 def decoder(fn):
     @wraps(fn)
     def req(*args, **kwargs):
-        t = time.time()
-        resp = fn(*args, **kwargs)
-        result = resp.json()
-        print(result)
-        # action = resp['action']
-        tdelta = time.time() - t
+        def timed():
+            t = time.time()
+            response = fn(*args, **kwargs)
+            dtime = time.time() - t
+            print(
+                round(dtime, 5),
+                'sec for decoding JSON'
+            )
+            return response, dtime
 
-        print(round(tdelta, 5), 'sec for decoding of Request', resp.url)
+        response, dtime = timed()
+
         try:
-            return loads(result), resp.status_code
+            json_data = response.json()
+            return json_data, response.status_code
         except TypeError:
-            return "", None
-
+            return "", 404
     return req
 
 
@@ -103,17 +112,11 @@ class Actor:
 
 
 def main():
-    # for n in range(100):
-    #    a.add_user(**{'group': 'admin', 'fullname': 'piedro', 'name': 'piedro-%s' % n, 'rank': -1})
-    api_response, action = a.request_all()
-    print(action, type(action))
+    a = Actor()
+    data, status = a.request_all()
+    pprint(data, )
 
 
-
-
-
-
-a = Actor()
 if __name__ == "__main__":
     main()
 

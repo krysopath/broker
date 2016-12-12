@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # coding=utf-8
-from flask import Flask
+from json import dumps
+
+from flask import Flask, make_response
 from flask_restful import Api
 
 from .config import __dbconn__
@@ -13,7 +15,7 @@ from broker.database import db_session, init_db
 from broker.models import *
 from broker.models.user_func import *
 from broker.ressources.users_ressources import UsersAPI
-from broker.jsonize import jsonize
+from broker.jsonize import APIEncoder
 from broker.exceptions import *
 
 
@@ -23,9 +25,21 @@ def shutdown_session(exception=None):
 
 
 init_db()
-print(type(User))
-print(type(User()))
 
 api = Api(app, errors=errors)
 api.add_resource(UsersAPI, '/api/v1/users')
 # api.add_resource(UserAPI, '/api/v1/users/<user_name>')
+
+
+@api.representation('application/json')
+def output_json(data, code, headers=None):
+    resp = make_response(
+        dumps(
+            data,
+            cls=APIEncoder,
+            indent=2
+        ),
+        code
+    )
+    resp.headers.extend(headers or {})
+    return resp
