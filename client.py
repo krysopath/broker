@@ -8,7 +8,7 @@ from sys import argv
 from client_libs import Actor
 
 __uri_public__ = 'https://{}:{}@endtropie.mooo.com/api/v1/{}'
-__uri_dev__ = 'http://{}:{}@localhost:4444/api/v2/{}'
+__uri_dev__ = 'http://{}:{}@192.168.0.254:4444/api/v2/{}'
 __uri__ = __uri_dev__
 
 
