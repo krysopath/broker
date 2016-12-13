@@ -30,9 +30,9 @@ def shutdown_session(exception=None):
 init_db()
 
 api = Api(app, errors=errors)
-api.add_resource(UsersList, '/api/v1/users')
-api.add_resource(UserRessource, '/api/v1/users/<string:user_name>')
-api.add_resource(GetToken, '/api/v1/token')
+api.add_resource(UsersList, '/api/v2/users')
+api.add_resource(UserRessource, '/api/v2/users/<string:user_name>')
+api.add_resource(GetToken, '/api/v2/token')
 
 
 @api.representation('application/json')

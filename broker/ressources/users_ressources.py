@@ -19,7 +19,7 @@ class UsersList(Resource):
         return {
             "action": "get_all_users",
             "result": {
-                "users": result
+                "users": result or None
             }
         }
 
@@ -62,49 +62,45 @@ class UserRessource(Resource):
         }
 
     def put(self, user_name):
-        if str(user_name) == user_name:
-            args = self.reqparse.parse_args()
-            user = User.query.filter(
-                User.name == user_name).first()
-            if user:
-                changes = {}
-                for k, v in args.items():
-                    if v:
-                        setattr(user, k, v)
-                        changes[k] = v
+        def answer():
+            return {
+                "action": "update_user",
+                "name": user_name,
+                "result": changes or None
+            }
 
-                db_session.commit()
-                return {
-                    "action": "update_user",
-                    "result": changes
-                }
+        args = self.reqparse.parse_args()
+        user = User.query.filter(
+            User.name == user_name).first()
+        changes = {}
+        if user:
+            for k, v in args.items():
+                if v:
+                    setattr(user, k, v)
+                    changes[k] = v
 
-            else:
-                return {
-                    "action": "update_user",
-                    "result": None
-                }
+            db_session.commit()
+            return answer()
+
+        else:
+            return answer()
 
     def delete(self, user_name):
-        if str(user_name) == user_name:
-            user = User.query.filter(User.name == user_name).first()
-            if user:
-                db_session.delete(user)
-                db_session.commit()
-                return {
-                    "action": "del_user",
-                    "result": {
-                        "id": user.id,
-                        "name": user.name,
-                        "deleted": True
-                    }
+        def answer(result):
+            return {
+                "action": "del_user",
+                "result": {
+                    "id": user.id or None,
+                    "name": user.name,
+                    "deleted": result
                 }
-            else:
-                return {
-                    "action": "delete_user",
-                    "result": {
-                        "id": None,
-                        "name": user_name,
-                        "deleted": False
-                    }
-                }
+            }
+
+        user = User.query.filter(User.name == user_name).first()
+        if user:
+            db_session.delete(user)
+            db_session.commit()
+            return answer(True)
+
+        else:
+            return answer(False)
