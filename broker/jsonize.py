@@ -18,7 +18,7 @@ class DataEncoder(JSONEncoder):
             fields = {}
             for field in [x for x in dir(obj)
                           if not x.startswith('_')
-                          # and x not in ['metadata', 'query', 'query_class']
+
                           ]:
                 data = obj.__getattribute__(field)
                 try:
@@ -38,10 +38,17 @@ class AlchemyEncoder(JSONEncoder):
             fields = {}
             for field in [x for x in dir(obj)
                           if not x.startswith('_')
-                          and x not in ['metadata', 'query', 'query_class']]:
+                          and x not in ['metadata',
+                                        'query',
+                                        'query_class',
+                                        'generate_auth_token',
+                                        'set_hash',
+                                        'check_hash',
+                                        'verify_auth_token',
+                                        'hash']]:
                 data = obj.__getattribute__(field)
                 try:
-                    print('AlchemyEncoder:', data.__class__, data)
+                    # print('AlchemyEncoder:', data.__class__, data)
                     dumps(data)  # this will fail on non-encodable values, like other classes
                     fields[field] = data
                 except TypeError:
@@ -59,18 +66,21 @@ class AlchemyEncoder(JSONEncoder):
                                 'sec': data.second, }
 
                     elif isinstance(data, InstrumentedList):
-                        fields[field] = {{x.id: x} for x in data}
+                        fields[field] = [
+                            {'id': x.id,
+                             'obj': x} for x in data]
 
                     elif isinstance(data, Query):
                         fields[field] = [
-                            {x.id: x.name} for x in data.all()]
+                            {'id': x.id,
+                             'obj': x.name} for x in data.all()]
 
                     else:
-                        fields[field] = "Error"
+                        fields[field] = "Unhandled by AlchemyEncoder"
 
                         # obj.__serialised = True
 
-            print("encoded", type(fields), fields)
+            #print("encoded to", type(fields))
             return fields
 
 
@@ -78,15 +88,25 @@ class APIEncoder(JSONEncoder):
     def default(self, obj):
 
         if isinstance(obj.__class__, DeclarativeMeta):
-            print("encoding", obj.__class__, "with", AlchemyEncoder)
+            # print("encoding",
+            #      obj.__class__,
+            #      "with", AlchemyEncoder)
 
-            return AlchemyEncoder(indent=None, check_circular=False).default(obj)
+            return AlchemyEncoder(
+                indent=None,
+                check_circular=False
+            ).default(obj)
 
 
 def jsonize(obj):
     @wraps(obj)
-    def wrapped(*args, **kwargs):
-        result = obj(*args, **kwargs)
-        return dumps(result, cls=APIEncoder, indent=None)
-
+    def wrapped(*args,
+                **kwargs):
+        result = obj(*args,
+                     **kwargs)
+        return dumps(
+            result,
+            cls=APIEncoder,
+            indent=None
+        )
     return wrapped

@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 # coding=utf-8
+import bcrypt
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
 from sqlalchemy import Column, Integer, Sequence, String, Table, ForeignKey, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
+from broker import app
 from broker.database import Base
 
-friends = Table(
+Friends = Table(
     'friends',
     Base.metadata,
     Column(
@@ -38,9 +42,9 @@ class User(Base):
     )
     friends = relationship(
         'User',  # defining the relationship, User is left side entity
-        secondary=friends,
-        primaryjoin=(friends.c.user_id == id),
-        secondaryjoin=(friends.c.friend_id == id),
+        secondary=Friends,
+        primaryjoin=(Friends.c.user_id == id),
+        secondaryjoin=(Friends.c.friend_id == id),
         lazy='dynamic'
     )
 
@@ -63,6 +67,37 @@ class User(Base):
 
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()
+
+    def set_hash(self, pw):
+        if not self.hash:
+            self.hash = bcrypt.hashpw(pw, bcrypt.gensalt(14))
+        else:
+            raise RuntimeWarning("Process tried to reset hash")
+
+    def check_hash(self, pw):
+        if bcrypt.checkpw(pw, self.hash):
+            return True
+        else:
+            raise RuntimeWarning("User supplied password doesnt match hash")
+
+    def generate_auth_token(self, expiration=600):
+        print("making a token for", self.name)
+        s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id, 'name': self.name})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            token_data = s.loads(token)
+        except SignatureExpired:
+            return None
+        except BadSignature:
+            return None
+
+        user = User.query.get(token_data['id'])
+        print("verified token of", token_data['name'])
+        return user
 
 
 class Email(Base):

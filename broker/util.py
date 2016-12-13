@@ -1,11 +1,60 @@
 #!/usr/bin/env python3
 # coding=utf-8
 from functools import wraps
-from flask import request, Response
+
+import bcrypt
+from flask import request, Response, g
+
+from broker import User
+from broker.database import init_db
+
+init_db()
+
+
+#######################################################
+
+
+def check_hash(pw, hash):
+    try:
+        return bcrypt.checkpw(pw, hash)
+    except TypeError:
+        return False
+
+
+def bcrypt_auth(user, pw):
+    try:
+        hash_of_user = User.query.filter(
+            User.name == user
+        ).first().hash
+        return check_hash(pw, hash_of_user)
+    except AttributeError as ae:
+        return False
+
+
+def fake_auth(user, pw):
+    return user == 'g' and pw == 'g25v09e85'
 
 
 def check_auth(username, password):
-    return username == 'g' and password == 'g25v09e85'
+    return fake_auth(username, password) or bcrypt_auth(username, password)
+
+
+def verify_password(username_or_token, password):
+    user = User.verify_auth_token(username_or_token)
+    if not user:
+        user = User.query.filter(
+            User.name == username_or_token
+        ).first()
+        if user and user.check_hash(password):
+            g.user = user
+            return True
+        return False
+    else:
+        g.user = user
+        return True
+
+
+#########################################
 
 
 def authenticate():

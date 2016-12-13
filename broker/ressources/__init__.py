@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
 # coding=utf-8
-
-def main():
-    return
-
-
-if __name__ == "__main__":
-    main()
+from .token_ressource import GetToken
+from .users_ressources import UsersList, UserRessource

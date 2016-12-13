@@ -2,105 +2,109 @@
 # coding=utf-8
 from flask_restful import Resource
 
-from broker.models import get_all_users
-from broker.util import requires_auth
+from broker import auth
+from broker.database import db_session
+from broker.models import get_all_users, User
+from broker.parser import user_parser
 
 
+class UsersList(Resource):
+    decorators = [auth.login_required]
+    reqparse = user_parser
 
-class UsersAPI(Resource):
-
-    @requires_auth
     def get(self):
-        def results():
-            result = {}
-            for user in get_all_users():
-                result[user.id] = user
-                # print(user.id)
+        result = {user.id: user
+                  for user in get_all_users()}
 
-            resp = {"users": result}
-            print(resp)
-            _serialised = {
-                "action": "get_all_users",
-                "result": resp}
+        return {
+            "action": "get_all_users",
+            "result": {
+                "users": result
+            }
+        }
 
-            return _serialised
+    def post(self):
+        args = self.reqparse.parse_args()
+        check = User.query.filter(
+            User.name == args['name']
+        ).first()
 
-        out = results()
-        print(out)
-        return out
+        if not check:
+            user = User()
+            for k, v in args.items():
+                if v != None:
+                    setattr(user, k, v)
+            db_session.add(user)
+            db_session.commit()
+
+            return {
+                "action": "add_user",
+                "result": {
+                    "id": user.id,
+                    "name": user.name
+                }
+            }
 
 
-# class UsersAPI(Resource):
-#     @requires_auth
-#     def get(self):
-#         users = db.session.query(User).order_by(User.id).all()
-#         results = {}
-#
-#         for user in users:
-#             results[user.id] = dict(user)
-#
-#         return jsonify(results)
-#
-#     @requires_auth
-#     def post(self):
-#         args = user_parser.parse_args()
-#         check = db.session.query(User).filter(
-#             User.name == args['name']).first()
-#         if not check:
-#             user = User()
-#             user.name = args['name']
-#             user.group = args['group']
-#             user.fullname = args['fullname'] or None
-#             user.rank = args['rank'] or 100
-#
-#             db.session.add(user)
-#             db.session.commit()
-#
-#             return jsonify(dict(user))
-#
-#         else:
-#             raise UserAlreadyExistsError
-#
-#
-# class UserAPI(Resource):
-#     @requires_auth
-#     def get(self, user_name):
-#         user = db.session.query(User) \
-#             .filter(User.name == user_name) \
-#             .first()
-#         if user:
-#             results = {'data': dict(user)}
-#             return jsonify(results)
-#
-#     @requires_auth
-#     def put(self, user_name):
-#         if not str(user_name) == user_name:
-#             raise MalformedPost
-#         args = user_parser.parse_args()
-#         user = db.session.query(User).filter(
-#             User.name == user_name).first()
-#         if user:
-#             changes = {}
-#             for k, v in args.items():
-#                 if v:
-#                     setattr(user, k, v)
-#                     changes[k] = v
-#
-#             db.session.commit()
-#             return jsonify({'changes': changes})
-#         else:
-#             return jsonify({'changes': None})
-#
-#     @requires_auth
-#     def delete(self, user_name):
-#         if not str(user_name) == user_name:
-#             raise MalformedPost
-#         user = db.session.query(User).filter(
-#             User.name == user_name).first()
-#         if user:
-#             db.session.delete(user)
-#             db.session.commit()
-#             return jsonify({'deleted': user_name})
-#         else:
-#             return jsonify({'deleted': None})
-#
+class UserRessource(Resource):
+    decorators = [auth.login_required]
+    reqparse = user_parser
+
+    def get(self, user_name):
+        results = {}
+        user = User.query.filter(User.name == user_name).first()
+        if user:
+            results = {'user': user}
+
+        return {
+            'action': 'get_user',
+            'result': None or results
+        }
+
+    def put(self, user_name):
+        if str(user_name) == user_name:
+            args = self.reqparse.parse_args()
+            user = User.query.filter(
+                User.name == user_name).first()
+            if user:
+                changes = {}
+                for k, v in args.items():
+                    if v:
+                        setattr(user, k, v)
+                        changes[k] = v
+
+                db_session.commit()
+                return {
+                    "action": "update_user",
+                    "result": changes
+                }
+
+            else:
+                return {
+                    "action": "update_user",
+                    "result": None
+                }
+
+    def delete(self, user_name):
+        if str(user_name) == user_name:
+            user = User.query.filter(User.name == user_name).first()
+            if user:
+                db_session.delete(user)
+                db_session.commit()
+                return {
+                    "action": "del_user",
+                    "result": {
+                        "id": user.id,
+                        "name": user.name,
+                        "deleted": True
+                    }
+                }
+            else:
+                return {
+                    "action": "delete_user",
+                    "result": {
+                        "id": None,
+                        "name": user_name,
+                        "deleted": False
+                    }
+                }
