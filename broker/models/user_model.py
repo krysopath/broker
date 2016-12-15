@@ -55,7 +55,7 @@ class User(Base):
         self.rank = rank
 
     def __repr__(self):
-        return "<User(id='%s', name='%s')>" \
+        return "<User(id='%r', name='%r')>" \
                % (self.id, self.name,)
 
     def __iter__(self):

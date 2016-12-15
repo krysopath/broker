@@ -8,11 +8,11 @@ from sys import argv
 from client_libs import Actor
 
 __uri_public__ = 'https://{}:{}@endtropie.mooo.com/api/v2/{}'
-__uri_dev__ = 'https://{}:{}@192.168.0.254:4444/api/v2/{}'
+__uri_dev__ = 'https://{}:{}@localhost:4444/api/v2/{}'
 __uri__ = __uri_public__
 
 
-def main(opts):
+def main():
     a = Actor(__uri__, "krysopath", "g25v09e85")
 
     data, status = a.request_all()
@@ -32,7 +32,10 @@ def main(opts):
 
 
 new_user = {
-    'name': "test-" + "".join([choice(ascii_letters).upper() for x in range(20)]),
+    'name': "test-" + "".join(
+        [choice(ascii_letters).upper()
+         for x in range(20)]
+    ),
     'fullname': "test",
     'email': "test@mail.com",
     'group': "user",
@@ -41,4 +44,4 @@ new_user = {
 if __name__ == "__main__":
     opts = argv[1:]
     if opts:
-        main(opts)
+        main()
