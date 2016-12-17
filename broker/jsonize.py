@@ -71,9 +71,9 @@ class AlchemyEncoder(JSONEncoder):
                             }
 
                     elif isinstance(data, Query):
-                        fields[field] = [
-                            {'id': x.id,
-                             'obj': x.name} for x in data.all()]
+                        fields[field] = {
+                            x.id: x.name for x in data.all()
+                            }
 
                     else:
                         fields[field] = "Unhandled: ", field, data.__str__(), obj.__str__()
