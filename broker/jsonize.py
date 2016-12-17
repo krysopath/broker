@@ -67,7 +67,7 @@ class AlchemyEncoder(JSONEncoder):
 
                     elif isinstance(data, InstrumentedList):
                         fields[field] = {
-                            x.id: x for x in data
+                            x.id: x.__str__() for x in data
                             }
 
                     elif isinstance(data, Query):
