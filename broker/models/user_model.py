@@ -99,6 +99,9 @@ class User(Base):
         print("verified token of", token_data['name'])
         return user
 
+    def __str__(self):
+        return self.name
+
 
 class Email(Base):
     __tablename__ = "emails"
@@ -119,6 +122,9 @@ class Email(Base):
     def __iter__(self):
         for p in ['id', 'addr']:
             yield p, getattr(self, p)
+
+    def __str__(self):
+        return self.addr
 
 
 User.emails = relationship(
@@ -145,6 +151,9 @@ class JID(Base):
     def __iter__(self):
         for p in ['id', 'jid']:
             yield p, getattr(self, p)
+
+    def __str__(self):
+        return self.jid
 
 
 User.jids = relationship(
