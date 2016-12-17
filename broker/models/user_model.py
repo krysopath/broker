@@ -3,7 +3,7 @@
 import bcrypt
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
-from sqlalchemy import Column, Integer, Sequence, String, Table, ForeignKey, TIMESTAMP
+from sqlalchemy import Column, Integer, BigInteger, Sequence, String, Table, ForeignKey, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -34,6 +34,7 @@ class User(Base):
     fullname = Column(String(100), nullable=True)
     group = Column(String(100), nullable=False)
     rank = Column(Integer)
+    reputation = Column(BigInteger)
     hash = Column(String(512))
     creation_time = Column(
         TIMESTAMP,
