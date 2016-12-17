@@ -76,7 +76,7 @@ class AlchemyEncoder(JSONEncoder):
                              'obj': x.name} for x in data.all()]
 
                     else:
-                        fields[field] = "Unhandled by AlchemyEncoder"
+                        fields[field] = "Unhandled by AlchemyEncoder: ", type(data), data.__repr__(), obj.__repr__()
 
                         # obj.__serialised = True
 
