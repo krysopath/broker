@@ -90,7 +90,7 @@ class User(Base):
         else:
             raise RuntimeWarning("User supplied password doesnt match hash")
 
-    def generate_auth_token(self, expiration=600):
+    def generate_auth_token(self, expiration=60):
         print("making a token for", self.name)
         s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
         return s.dumps({'id': self.id, 'name': self.name})
