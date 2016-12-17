@@ -56,11 +56,20 @@ class User(Base):
         self.rank = rank
 
     def __repr__(self):
-        return "<User(id='%r', name='%r')>" \
+        return "<User(id=%r, name=%r)>" \
                % (self.id, self.name,)
 
     def __iter__(self):
-        for p in ['id', 'name', 'fullname', 'group', 'rank', 'creation_time', 'emails', 'jids', 'friends']:
+        for p in ['id',
+                  'name',
+                  'fullname',
+                  'group',
+                  'rank',
+                  'creation_time',
+                  'emails',
+                  'jids',
+                  'friends',
+                  'reputation']:
             yield p, getattr(self, p)
 
     def __hash__(self):
