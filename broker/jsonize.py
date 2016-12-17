@@ -62,8 +62,8 @@ class AlchemyEncoder(JSONEncoder):
                                 'month': data.month,
                                 'day': data.day,
                                 'hour': data.hour,
-                                'min': data.minute,
-                                'sec': data.second, }
+                                'minute': data.minute,
+                                'second': data.second, }
 
                     elif isinstance(data, InstrumentedList):
                         fields[field] = {
