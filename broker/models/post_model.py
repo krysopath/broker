@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql import func
 
 from broker.database import Base
-from broker.models import User
+from .user_model import User
 
 tagstoposts = Table(
     'tags_posts',
