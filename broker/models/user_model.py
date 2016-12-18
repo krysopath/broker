@@ -29,10 +29,24 @@ Friends = Table(
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, Sequence('users_id_seq'), primary_key=True)
-    name = Column(String(50), unique=True, nullable=False)
-    fullname = Column(String(100), nullable=True)
-    group = Column(String(100), nullable=False)
+    id = Column(
+        Integer,
+        Sequence('users_id_seq'),
+        primary_key=True
+    )
+    name = Column(
+        String(50),
+        unique=True,
+        nullable=False
+    )
+    fullname = Column(
+        String(100),
+        nullable=True
+    )
+    group = Column(
+        String(100),
+        nullable=False
+    )
     rank = Column(Integer)
     reputation = Column(BigInteger)
     hash = Column(String(512))
@@ -60,16 +74,19 @@ class User(Base):
                % (self.id, self.name,)
 
     def __iter__(self):
-        for p in ['id',
-                  'name',
-                  'fullname',
-                  'group',
-                  'rank',
-                  'creation_time',
-                  'emails',
-                  'jids',
-                  'friends',
-                  'reputation']:
+        # TODO implement expresions in this list like "showx and 'x'"
+        for p in [
+            'id',
+            'name',
+            'fullname',
+            'group',
+            'rank',
+            'creation_time',
+            'emails',
+            'jids',
+            'friends',
+            'reputation'
+        ]:
             yield p, getattr(self, p)
 
     def __hash__(self):
@@ -80,24 +97,38 @@ class User(Base):
 
     def set_hash(self, pw):
         if not self.hash:
-            self.hash = bcrypt.hashpw(pw, bcrypt.gensalt(14))
+            self.hash = bcrypt.hashpw(
+                pw, bcrypt.gensalt(14)
+            )
         else:
-            raise RuntimeWarning("Process tried to reset hash")
+            raise RuntimeWarning(
+                "Process tried to reset hash"
+            )
 
     def check_hash(self, pw):
         if bcrypt.checkpw(pw, self.hash):
             return True
         else:
-            raise RuntimeWarning("User supplied password doesnt match hash")
+            raise RuntimeWarning(
+                "User supplied password doesnt match hash"
+            )
 
-    def generate_auth_token(self, expiration=60):
+    def generate_auth_token(self, expiration=1200):
         print("making a token for", self.name)
-        s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
-        return s.dumps({'id': self.id, 'name': self.name})
+        s = Serializer(
+            app.config['SECRET_KEY'],
+            expires_in=expiration
+        )
+        return s.dumps(
+            {'id': self.id,
+             'name': self.name}
+        )
 
     @staticmethod
     def verify_auth_token(token):
-        s = Serializer(app.config['SECRET_KEY'])
+        s = Serializer(
+            app.config['SECRET_KEY']
+        )
         try:
             token_data = s.loads(token)
         except SignatureExpired:
@@ -105,8 +136,13 @@ class User(Base):
         except BadSignature:
             return None
 
-        user = User.query.get(token_data['id'])
-        print("verified token of", token_data['name'])
+        user = User.query.get(
+            token_data['id']
+        )
+        print(
+            "verified token of",
+            token_data['name']
+        )
         return user
 
     def __str__(self):
@@ -115,9 +151,20 @@ class User(Base):
 
 class Email(Base):
     __tablename__ = "emails"
-    id = Column(Integer, Sequence('emails_id_seq'), primary_key=True)
-    addr = Column(String(150), unique=True, nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'))
+    id = Column(
+        Integer,
+        Sequence('emails_id_seq'),
+        primary_key=True
+    )
+    addr = Column(
+        String(150),
+        unique=True,
+        nullable=False
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey('users.id')
+    )
 
     user = relationship(
         "User", back_populates="emails")

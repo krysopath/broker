@@ -3,14 +3,14 @@
 from flask_restful import Resource
 
 from broker import auth
-from broker.database import db_session
+from broker.database import db_session as db
 from broker.models import get_all_users, User
 from broker.parser import user_parser
 
 
 class UsersList(Resource):
     decorators = [auth.login_required]
-    reqparse = user_parser
+    parser = user_parser
 
     def get(self):
         result = {user.id: user
@@ -24,7 +24,7 @@ class UsersList(Resource):
         }
 
     def post(self):
-        args = self.reqparse.parse_args()
+        args = self.parser.parse_args()
         check = User.query.filter(
             User.name == args['name']
         ).first()
@@ -34,8 +34,8 @@ class UsersList(Resource):
             for k, v in args.items():
                 if v != None:
                     setattr(user, k, v)
-            db_session.add(user)
-            db_session.commit()
+            db.add(user)
+            db.commit()
 
             return {
                 "action": "add_user",
@@ -48,7 +48,7 @@ class UsersList(Resource):
 
 class UserRessource(Resource):
     decorators = [auth.login_required]
-    reqparse = user_parser
+    parser = user_parser
 
     def get(self, user_name):
         results = {}
@@ -69,7 +69,7 @@ class UserRessource(Resource):
                 "result": changes or None
             }
 
-        args = self.reqparse.parse_args()
+        args = self.parser.parse_args()
         user = User.query.filter(
             User.name == user_name).first()
         changes = {}
@@ -79,7 +79,7 @@ class UserRessource(Resource):
                     setattr(user, k, v)
                     changes[k] = v
 
-            db_session.commit()
+            db.commit()
             return answer()
 
         else:
@@ -98,8 +98,8 @@ class UserRessource(Resource):
 
         user = User.query.filter(User.name == user_name).first()
         if user:
-            db_session.delete(user)
-            db_session.commit()
+            db.delete(user)
+            db.commit()
             return answer(True)
 
         else:

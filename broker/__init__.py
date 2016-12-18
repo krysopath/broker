@@ -13,10 +13,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = __dbconn__
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 auth = HTTPBasicAuth()
 
-from broker.database import db_session, init_db
+from broker.database import db, init_db
 from broker.models import *
 from broker.models.user_func import *
-from broker.ressources import UsersList, GetToken, UserRessource
+from broker.ressources import UsersList, GetToken, UserRessource, SendMessage
 from broker.jsonize import APIEncoder
 from broker.exceptions import *
 from broker.util import verify_password
@@ -24,7 +24,7 @@ from broker.util import verify_password
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-    db_session.remove()
+    db.remove()
 
 
 init_db()
@@ -32,6 +32,7 @@ init_db()
 api = Api(app, errors=errors)
 api.add_resource(UsersList, '/api/v2/users')
 api.add_resource(UserRessource, '/api/v2/users/<string:user_name>')
+api.add_resource(SendMessage, '/api/v2/msg')
 api.add_resource(GetToken, '/api/v2/token')
 
 
