@@ -43,7 +43,7 @@ class User(Base):
         String(100),
         nullable=True
     )
-    group = Column(
+    role = Column(
         String(100),
         nullable=False
     )

@@ -11,7 +11,9 @@ class SendMessage(Resource):
 
     def post(self):
         args = self.parser.parse_args()
-        return args
+        return {
+            'result': args
+        }
 
     def get(self):
         args = self.parser.parse_args()
