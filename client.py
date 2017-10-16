@@ -26,8 +26,8 @@ def main():
     pprint(data['result'])
     data, status = a.request_all()
     pprint(data['result'])
-    data, status = a.del_user(new_user['name'])
-    pprint(data['result'])
+    # data, status = a.del_user(new_user['name'])
+    # pprint(data['result'])
 
 
 new_user = {
