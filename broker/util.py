@@ -23,10 +23,10 @@ def check_hash(pw, hash):
 
 def bcrypt_auth(user, pw):
     try:
-        hash_of_user = User.query.filter(
+        login_user = User.query.filter(
             User.name == user
-        ).first().hash
-        return check_hash(pw, hash_of_user)
+        ).first()
+        return check_hash(pw, login_user.hash)
     except AttributeError as ae:
         return False
 
@@ -36,7 +36,8 @@ def fake_auth(user, pw):
 
 
 def check_auth(username, password):
-    return fake_auth(username, password) or bcrypt_auth(username, password)
+    return fake_auth(username, password) or \
+           bcrypt_auth(username, password)
 
 
 def verify_password(username_or_token, password):
@@ -45,7 +46,7 @@ def verify_password(username_or_token, password):
         user = User.query.filter(
             User.name == username_or_token
         ).first()
-        if user and user.check_hash(password):
+        if user and user.check_hash(password.encode()):
             g.user = user
             return True
         return False

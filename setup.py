@@ -12,7 +12,7 @@ out = setup(
     license='GPL',
     # packages=[
     #    'models',
-    #    'ressources'
+    #    'resources'
     # ],
     scripts=[
         'broker_server.py',
@@ -21,7 +21,8 @@ out = setup(
         'sqlalchemy',
         'flask',
         'flask_restful',
-        'flask_httpauth'
+        'flask_httpauth',
+        'sleekxmpp'
     ],
     zip_safe=False
 )

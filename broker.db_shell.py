@@ -8,9 +8,9 @@ from broker.models import User, Post
 
 init_db()
 
-app.config['SECRET_KEY'] = b"g25v09e85"
-admins = User.query.filter(User.group == "admin").all()
-users = User.query.filter(User.group == "user").all()
+app.config['SECRET_KEY'] = b"something"
+admins = User.query.filter(User.role == "admin").all()
+users = User.query.filter(User.role == "user").all()
 posts = Post.query.all()
 
 

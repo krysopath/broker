@@ -10,6 +10,7 @@ engine = create_engine(
     __dbconn__,
     convert_unicode=True
 )
+
 db_session = scoped_session(
     sessionmaker(
         autocommit=False,

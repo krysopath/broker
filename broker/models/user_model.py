@@ -63,10 +63,10 @@ class User(Base):
         lazy='dynamic'
     )
 
-    def __init__(self, name=None, fullname=None, group=None, rank=None):
+    def __init__(self, name=None, fullname=None, role=None, rank=None):
         self.name = name
         self.fullname = fullname
-        self.group = group
+        self.role = role
         self.rank = rank
 
     def __repr__(self):
@@ -74,12 +74,12 @@ class User(Base):
                % (self.id, self.name,)
 
     def __iter__(self):
-        # TODO implement expresions in this list like "showx and 'x'"
+        # TODO implement expressions in this list like "showx and 'x'"
         for p in [
             'id',
             'name',
             'fullname',
-            'group',
+            'role',
             'rank',
             'creation_time',
             'emails',
@@ -192,8 +192,17 @@ User.emails = relationship(
 
 class JID(Base):
     __tablename__ = "jids"
-    id = Column(Integer, Sequence('jids_id_seq'), primary_key=True)
-    jid = Column(String(150), unique=True, nullable=False)
+    id = Column(
+        Integer,
+        Sequence('jids_id_seq'),
+        primary_key=True
+    )
+    jid = Column(
+        String(150),
+        unique=True,
+        nullable=False
+    )
+    # pw = Column(String(250), nullable=True)
     user_id = Column(Integer, ForeignKey('users.id'))
 
     user = relationship("User", back_populates="jids")

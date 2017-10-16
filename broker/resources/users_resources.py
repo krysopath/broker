@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
+from flask import g, request
 from flask_restful import Resource
 
 from broker import auth
@@ -18,6 +19,7 @@ class UsersList(Resource):
 
         return {
             "action": "get_all_users",
+            "uri": request.url,
             "result": {
                 "users": result or None
             }
@@ -29,16 +31,17 @@ class UsersList(Resource):
             User.name == args['name']
         ).first()
 
-        if not check:
+        if not check and g.user.role == "admin":
             user = User()
             for k, v in args.items():
-                if v != None:
+                if v:
                     setattr(user, k, v)
             db.add(user)
             db.commit()
 
             return {
                 "action": "add_user",
+                "uri": request.url,
                 "result": {
                     "id": user.id,
                     "name": user.name
@@ -51,21 +54,23 @@ class UserRessource(Resource):
     parser = user_parser
 
     def get(self, user_name):
-        results = {}
-        user = User.query.filter(User.name == user_name).first()
+        result_user = {}
+        user = User.query.filter(
+            User.name == user_name).first()
         if user:
-            results = {'user': user}
+            result_user = {'user': user}
 
         return {
             'action': 'get_user',
-            'result': None or results
+            "uri": request.url,
+            'result': None or result_user
         }
 
     def put(self, user_name):
         def answer():
             return {
                 "action": "update_user",
-                "name": user_name,
+                "uri": request.url,
                 "result": changes or None
             }
 
@@ -73,9 +78,10 @@ class UserRessource(Resource):
         user = User.query.filter(
             User.name == user_name).first()
         changes = {}
-        if user:
+        if g.user.name == user_name \
+                or g.user.role == "admin":
             for k, v in args.items():
-                if v:
+                if v is not None:
                     setattr(user, k, v)
                     changes[k] = v
 
@@ -89,6 +95,7 @@ class UserRessource(Resource):
         def answer(result):
             return {
                 "action": "del_user",
+                "uri": request.url,
                 "result": {
                     "id": user.id or None,
                     "name": user.name,
@@ -96,8 +103,11 @@ class UserRessource(Resource):
                 }
             }
 
-        user = User.query.filter(User.name == user_name).first()
-        if user:
+        user = User.query.filter(
+            User.name == user_name).first()
+
+        if g.user.name == user_name \
+                or g.user.role == "admin":
             db.delete(user)
             db.commit()
             return answer(True)

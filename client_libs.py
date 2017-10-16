@@ -20,7 +20,7 @@ def requester(fn):
         with open('last-response.txt', 'w') as last:
             last.write(resp.text)
 
-        print(round(tdelta, 5), 'sec for', resp.request)
+        print("\t", round(tdelta, 5), 'sec for', resp.request)
         if resp.status_code != 200:
             if resp.status_code == 401:
                 raise NotAuthedError
@@ -40,10 +40,10 @@ def decoder(fn):
             t = time()
             response = fn(*args, **kwargs)
             dtime = time() - t
-            print(
-                round(dtime, 5),
+            print("\t",
+                  round(dtime, 5),
                 'sec for decoding JSON'
-            )
+                  )
             return response, dtime
 
         response, dtime = timed()

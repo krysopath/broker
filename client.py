@@ -3,13 +3,12 @@
 from pprint import pprint
 from random import choice
 from string import ascii_letters
-from sys import argv
 
 from client_libs import Actor
 
 __uri_public__ = 'https://{}:{}@endtropie.mooo.com/api/v2/{}'
 __uri_dev__ = 'https://{}:{}@localhost:4444/api/v2/{}'
-__uri__ = __uri_public__
+__uri__ = __uri_dev__
 
 
 def main():
@@ -38,10 +37,8 @@ new_user = {
     ),
     'fullname': "test",
     'email': "test@mail.com",
-    'group': "user",
+    'role': "user",
     'rank': 10
 }
 if __name__ == "__main__":
-    opts = argv[1:]
-    if opts:
-        main()
+    main()
