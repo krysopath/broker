@@ -32,7 +32,7 @@ def bcrypt_auth(user, pw):
 
 
 def fake_auth(user, pw):
-    return user == 'g' and pw == 'g25v09e85'
+    return user == 'g' and pw == 'secret'
 
 
 def check_auth(username, password):
