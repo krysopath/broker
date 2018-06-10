@@ -22,7 +22,7 @@ class SendMessage(Resource):
         if args:
             bot = SendMsgBot(
                 _from.jid,
-                "g25v09e85",
+                "SECRET",
                 _to,
                 _message
             )
