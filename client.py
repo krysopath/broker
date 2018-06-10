@@ -12,7 +12,7 @@ __uri__ = __uri_dev__
 
 
 def main():
-    a = Actor(__uri__, "krysopath", "g25v09e85")
+    a = Actor(__uri__, "krysopath", "Secret")
 
     data, status = a.request_all()
     pprint(data['result'])
